@@ -70,11 +70,15 @@ namespace CaseStudy_juhee_2546152
                     client.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
                     client.BaseAddress = new Uri("https://gorest.co.in/public/");
                     HttpResponseMessage response = client.GetAsync("v2/users/" + txtSearch.Text).Result;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        Employee emp = response.Content.ReadAsAsync<Employee>().Result;
+                        List<Employee> emplist = new List<Employee>();
+                        emplist.Add(emp);
+                        grdEmployee.DataSource = emplist;
+                        txtSearch.Text = "";
 
-                    Employee emp = response.Content.ReadAsAsync<Employee>().Result;
-                    List<Employee> emplist = new List<Employee>();
-                    emplist.Add(emp);
-                    grdEmployee.DataSource = emplist;
+                    }                 
                 }
             }
             catch (Exception ex)
@@ -104,6 +108,7 @@ namespace CaseStudy_juhee_2546152
                     {
                         MessageBox.Show(txtSearch.Text + " " + "deleted successfully");
                         GetAllEmployee();
+                        txtSearch.Text = "";
                     }
                     else
                         MessageBox.Show("error while deleting");
@@ -142,7 +147,7 @@ namespace CaseStudy_juhee_2546152
                         {
                             MessageBox.Show("record inserted successfully");
                             GetAllEmployee();
-                            var str = response.Content;
+                            ClearTextValue();
                         }
 
                         else
@@ -159,10 +164,6 @@ namespace CaseStudy_juhee_2546152
                 throw ;
             }
 
-            finally
-            {
-                ClearTextValue();
-            }
         }
         /// <summary>
         /// clear the textbox value after insert
@@ -194,12 +195,23 @@ namespace CaseStudy_juhee_2546152
             }
             if (txtGender.Text == string.Empty)
             {
-                MessageBox.Show("Gender is required", "failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Gender is required", "failed", MessageBoxButtons.OK, MessageBoxIcon.Error );              
                 return false;
             }
-            if (txtStatus.Text == string.Empty)
+            if (txtGender.Text.ToLower() != "male" && txtGender.Text.ToLower() != "female")
+            {
+                MessageBox.Show("please enter male/female as gender", "failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+                if (txtStatus.Text == string.Empty)
             {
                 MessageBox.Show("Status is required", "failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            if (txtStatus.Text.ToLower() != "active" && txtStatus.Text.ToLower() != "inactive")
+            {
+                MessageBox.Show("please enter active/inactive as status", "failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
             return true;
